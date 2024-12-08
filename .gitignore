@@ -6,3 +6,63 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+# IntelliJ IDEA specific files
+.idea/
+*.iml
+*.iws
+
+# Logs
+/logs/
+*.log
+
+# Compiled class files
+/out/
+*.class
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Maven/Gradle specific files
+target/
+# Node specific files
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# JetBrains user-specific files
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+.idea/modules.xml
+
+# IntelliJ run/debug configuration
+.idea/runConfigurations/
+
+# Generated files
+*.jar
+*.war
+*.ear
+*.exe
+*.dll
+*.so
+*.dmg
+*.pyc
+*.pyo
+*.pyd
+*.sublime-workspace
+
+# Exclude coverage reports
+coverage/
+
+# Linting and formatting
+.eslintcache
+
+# Dependency directories
+/.mvn/
+/.gradle/
+/out/

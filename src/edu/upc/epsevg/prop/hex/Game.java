@@ -1,5 +1,6 @@
 package edu.upc.epsevg.prop.hex;
 
+import edu.upc.epsevg.prop.hex.players.BogoHex;
 import edu.upc.epsevg.prop.hex.players.HumanPlayer;
 import edu.upc.epsevg.prop.hex.players.RandomPlayer;
 import edu.upc.epsevg.prop.hex.IPlayer;
@@ -25,9 +26,9 @@ public class Game {
             @Override
             public void run() {
                 
-                IPlayer player1 = new H_E_X_Player(2/*GB*/);
-                
-                IPlayer player2 = new HumanPlayer("Human");
+                //IPlayer player1 = new H_E_X_Player(2/*GB*/);
+                IPlayer player2 = new BogoHex(4,false);
+                IPlayer player1 = new HumanPlayer("Human");
                                 
                 new Board(player1 , player2, 11 /*mida*/,  10/*s*/, false);
              }
