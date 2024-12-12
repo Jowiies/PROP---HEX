@@ -7,10 +7,10 @@ public class BogoHex implements IPlayer, IAuto
 {
     private final String name = "BogoHexPlayer";
     private boolean ids;
-    MinMax minMaxAlgorithm;
+    MiniMax miniMaxAlgorithm;
     public BogoHex(int maxDepth, boolean ids)
     {
-        minMaxAlgorithm = ids ? new Iterative(maxDepth) : new Basic(maxDepth);
+        miniMaxAlgorithm = ids ? new Iterative(maxDepth) : new Basic(maxDepth);
         this.ids = ids;
     }
 
@@ -18,9 +18,9 @@ public class BogoHex implements IPlayer, IAuto
     public PlayerMove move(HexGameStatus hexGameStatus)
     {
         return new PlayerMove(
-                minMaxAlgorithm.findBestMove(hexGameStatus),
-                minMaxAlgorithm.getExplorationDepth(),
-                minMaxAlgorithm.getMaxDepth(),
+                miniMaxAlgorithm.findBestMove(hexGameStatus),
+                miniMaxAlgorithm.getExplorationDepth(),
+                miniMaxAlgorithm.getMaxDepth(),
                 ids ? SearchType.MINIMAX_IDS : SearchType.MINIMAX
         );
     }
@@ -28,7 +28,7 @@ public class BogoHex implements IPlayer, IAuto
     @Override
     public void timeout()
     {
-        minMaxAlgorithm.stop();
+        miniMaxAlgorithm.stop();
     }
 
     @Override

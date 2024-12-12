@@ -30,7 +30,7 @@ public class Game {
                 IPlayer player2 = new BogoHex(8,true);
                 IPlayer player1 = new HumanPlayer("Human");
                                 
-                new Board(player1 , player2, 11 /*mida*/,  10/*s*/, false);
+                new Board(player1 , player2, 11 /*mida*/,  15/*s*/, false);
              }
         });
     }
