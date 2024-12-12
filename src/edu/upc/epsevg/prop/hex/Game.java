@@ -27,7 +27,7 @@ public class Game {
             public void run() {
                 
                 //IPlayer player1 = new H_E_X_Player(2/*GB*/);
-                IPlayer player2 = new BogoHex(4,false);
+                IPlayer player2 = new BogoHex(8,true);
                 IPlayer player1 = new HumanPlayer("Human");
                                 
                 new Board(player1 , player2, 11 /*mida*/,  10/*s*/, false);
