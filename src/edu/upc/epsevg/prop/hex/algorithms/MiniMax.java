@@ -26,13 +26,12 @@ public abstract class MiniMax
 
     protected int getBestScore(HexGameStatus status, int depth, int alpha, int beta, boolean isMax)
     {
-        exploratedNodes++;
-
-        if (stop) {return isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;}
+        if (stop) {return 0;}
 
         List<MoveNode> moveList = status.getMoves();
-        if (depth == 0 || moveList.isEmpty()) {
-            return 0;
+        if (depth == 0) {
+            exploratedNodes++;
+            return heuristic.getValue(status);
         }
 
         int bestScore = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
@@ -40,20 +39,20 @@ public abstract class MiniMax
         for (MoveNode mn : moveList) {
             HexGameStatus newStatus = new HexGameStatus(status);
             newStatus.placeStone(mn.getPoint());
-
             if (newStatus.isGameOver()) {
                 return isMax ? Integer.MAX_VALUE : Integer.MIN_VALUE;
             }
 
-            if (stop) {return isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;}
-
             int score = getBestScore(newStatus, depth - 1, alpha, beta, !isMax);
+
+            if (stop) {return 0;}
+
             bestScore = isMax ? Math.max(bestScore, score) : Math.min(bestScore, score);
 
-            alpha = isMax ? Math.max(alpha, bestScore) : alpha;
-            beta = !isMax ? Math.min(beta, bestScore) : beta;
+            if(isMax) alpha = Math.max(alpha, bestScore);
+            else beta = Math.min(beta, bestScore);
 
-            if (beta <= alpha) {break;}
+            if (alpha >= beta) {break;}
         }
 
         return bestScore;

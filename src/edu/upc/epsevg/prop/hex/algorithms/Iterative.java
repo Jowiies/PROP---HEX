@@ -23,11 +23,10 @@ public class Iterative extends MiniMax
         List<MoveNode> moveList = status.getMoves();
         int bestScore = Integer.MIN_VALUE;
         Point move = moveList.getFirst().getPoint();
+        Point trueMove = move;
 
         for (int depth = 1; depth <= maxDepth; depth++) {
-            if (stop) {break;}
 
-            currentDepth = depth;
             for (MoveNode mn : moveList) {
                 if (stop) {break;}
 
@@ -45,10 +44,16 @@ public class Iterative extends MiniMax
                     move = mn.getPoint();
                 }
             }
+
+            if (!stop) {
+                currentDepth = depth;
+                trueMove = move;
+            }
+            else break;
         }
 
         stop = false;
-        return move;
+        return trueMove;
     }
 
     @Override

@@ -14,6 +14,12 @@ public class BogoHex implements IPlayer, IAuto
         this.ids = ids;
     }
 
+    public BogoHex()
+    {
+        this.ids = true;
+        miniMaxAlgorithm = new Iterative(Integer.MAX_VALUE);
+    }
+
     @Override
     public PlayerMove move(HexGameStatus hexGameStatus)
     {
