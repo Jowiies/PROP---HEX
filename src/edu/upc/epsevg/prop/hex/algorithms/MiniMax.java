@@ -28,6 +28,10 @@ public abstract class MiniMax
     {
         if (stop) {return 0;}
 
+        if (status.isGameOver()) {
+            return isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        }
+
         List<MoveNode> moveList = status.getMoves();
         if (depth == 0) {
             exploratedNodes++;
@@ -37,11 +41,9 @@ public abstract class MiniMax
         int bestScore = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         for (MoveNode mn : moveList) {
+            if (stop) {return 0;}
             HexGameStatus newStatus = new HexGameStatus(status);
             newStatus.placeStone(mn.getPoint());
-            if (newStatus.isGameOver()) {
-                return isMax ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-            }
 
             int score = getBestScore(newStatus, depth - 1, alpha, beta, !isMax);
 

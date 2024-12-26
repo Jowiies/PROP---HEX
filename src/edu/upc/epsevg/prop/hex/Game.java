@@ -27,10 +27,10 @@ public class Game {
             public void run() {
                 
                 //IPlayer player1 = new H_E_X_Player(2/*GB*/);
-                IPlayer player2 = new BogoHex();
-                IPlayer player1 = new HumanPlayer("Rand");
-                                
-                new Board(player1 , player2, 6 /*mida*/,  30/*s*/, true);
+                IPlayer player1 = new BogoHex(8, true);
+                IPlayer player2 = new RandomPlayer("Rand");
+
+                new Board(player1 , player2, 5 /*mida*/,  20/*s*/, false);
              }
         });
     }
