@@ -30,7 +30,7 @@ public class Basic extends MiniMax
                 return mn.getPoint();
             }
 
-            int score = getBestScore(newStatus, maxDepth, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
+            int score = getBestScore(newStatus, maxDepth-1, bestScore, Integer.MAX_VALUE, false);
 
             if (score > bestScore) {
                 bestScore = score;

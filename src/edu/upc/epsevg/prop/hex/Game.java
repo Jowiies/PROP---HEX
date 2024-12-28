@@ -26,11 +26,11 @@ public class Game {
             @Override
             public void run() {
                 
-                //IPlayer player1 = new H_E_X_Player(2/*GB*/);
+              IPlayer player2 = new H_E_X_Player(2/*GB*/);
                 IPlayer player1 = new BogoHex(8, true);
-                IPlayer player2 = new RandomPlayer("Rand");
+                //IPlayer player2 = new RandomPlayer("Rand");
 
-                new Board(player1 , player2, 5 /*mida*/,  20/*s*/, false);
+                new Board(player1 , player2, 9 /*mida*/,  15/*s*/, false);
              }
         });
     }

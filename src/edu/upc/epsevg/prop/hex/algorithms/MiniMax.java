@@ -35,7 +35,7 @@ public abstract class MiniMax
         List<MoveNode> moveList = status.getMoves();
         if (depth == 0) {
             exploratedNodes++;
-            return heuristic.getValue(status);
+            return heuristic.evaluate(status);
         }
 
         int bestScore = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
