@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -23,105 +24,102 @@ public class Heuristic
     
     public static int evaluate(HexGameStatus gameStatus) {
         PlayerType currentPlayer = gameStatus.getCurrentPlayer();
-        PlayerType opponent = (currentPlayer == PlayerType.PLAYER1) ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
+        PlayerType opponent = PlayerType.opposite(currentPlayer);
         int currentPlayerScore = dijkstra(gameStatus, currentPlayer);
         int opponentScore = dijkstra(gameStatus, opponent);
         int color = (currentPlayer == PlayerType.PLAYER1) ? 1 : -1;
 
 
-        return (opponentScore-currentPlayerScore) + evaluateConnectivity(gameStatus,color) + heuristicBlockOpponent(gameStatus,currentPlayer) - evaluateOpponentBarriers(gameStatus, color) ;
+        return (currentPlayerScore - opponentScore);
+				//+ evaluateConnectivity(gameStatus,color) 
+				//+ heuristicBlockOpponent(gameStatus,currentPlayer) 
+				//- evaluateOpponentBarriers(gameStatus, color) ;
    }
+	public static int dijkstra(HexGameStatus game, PlayerType player) 
+	{
+		//System.out.println("This Is Dijkstra");
+		int size = game.getSize();
+		int[][] distance = new int[size][size];
+		Point[][] predecessor = new Point[size][size];
+		PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> a.cost - b.cost);
+		boolean[][] visited = new boolean[size][size]; 
 
-        public static int dijkstra(HexGameStatus gameStatus, PlayerType player) {
-        int n = gameStatus.getSize();
-        Map<Point, Integer> distances = new HashMap<>();
-        PriorityQueue<Point> pq = new PriorityQueue<>(Comparator.comparingInt(distances::get));
-        Set<Point> visited = new HashSet<>();
-        // Nodo virtual inicial y final
-        Point startNode = new Point(0, 0);
-        Point endNode = new Point(-2, -2);
+		// Initialize distances with infinity 
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) { 
+				distance[i][j] = Integer.MAX_VALUE;
+				predecessor[i][j] = null;
+			} 
+		} 
 
-        // Inicializar la cola de prioridad con nodos virtuales
-        for (int i = 0; i < n; i++) {
-            Point initialPoint = (player == PlayerType.PLAYER1) ? new Point(i, 0) : new Point(0, i);
-            distances.put(initialPoint, Integer.MAX_VALUE);
-           // pq.add(initialPoint);
-            
-            //System.out.println(initialPoint);
-           // Point finalPoint = (player == PlayerType.PLAYER1) ? new Point(i, n - 1) : new Point(n - 1, i);
-            //distances.put(finalPoint, Integer.MAX_VALUE);
-        }
-        distances.put(startNode, 0);
-        distances.put(endNode, Integer.MAX_VALUE);
-        pq.add(startNode);
-       // visited.add(startNode); 
-
-        while (!pq.isEmpty()) {
-            Point current = pq.poll();
-           // System.out.println(pq.peek() + " " + pq.peek() + "nei");
-            //
-            if (current.equals(endNode)) {
-                return distances.get(current);
-            }
-
-            if (visited.contains(current)) {
-                continue;
-            }
-
-            int k = 0;
-            for (Point neighbor : gameStatus.getNeigh(current)) {
-                
-                if (visited.contains(neighbor)) {
-                    continue;
-                }
-                
-
-                int cellState = gameStatus.getPos(neighbor);
-                int cost;
-                int color = (player == PlayerType.PLAYER1) ? 1 : -1;
-                if (cellState == color ) {
-                    cost = 0; // Nodo del jugador actual
-                } else if (cellState == 0) {
-                    cost = 1; // Nodo vacío
-                } else {
-                    continue; // Nodo ocupado por el oponente, no se puede atravesar
-                }
-                
-                boolean helpsAdvance = (player == PlayerType.PLAYER1)? neighbor.x > current.x // Avanza hacia la meta en x
-                : neighbor.y > current.y; // Avanza hacia la meta en y
-
-                if (!helpsAdvance) {
-                    cost += 2; // Penalización adicional para nodos que no ayudan
-                }
-
-                int newDist = newDist = distances.get(current) + cost ;;
-               // if(distances.get(current)== Integer.MAX_VALUE ){
-                //    newDist = cost;
-               // }else 
-                
-
-                if (newDist < distances.getOrDefault(neighbor, Integer.MAX_VALUE)) {
-                    distances.put(neighbor, newDist);
-                  
-                    pq.add(neighbor);
-                     
-                    //System.out.println(neighbor + " " + distances.get(neighbor));
-                }
-                
-            }
-           if (player == PlayerType.PLAYER1 && current.x == n - 1 ||
-            player == PlayerType.PLAYER2 && current.y == n - 1) {
-            if (distances.get(current) < distances.getOrDefault(endNode, Integer.MAX_VALUE)) {
-                distances.put(endNode, distances.get(current));
-                pq.add(endNode);
-            }
-        }
-         visited.add(current);    
-        }
-
-        return Integer.MAX_VALUE; // No se encontró un camino
-}
-        
+		// Add virtual start nodes 
+		if (player == PlayerType.PLAYER2) { 
+			for (int x = 0; x < size; x++) {
+				//if (game.getPos(x,0) == -1) {
+					distance[x][0] = 0; 
+					pq.add(new Node(new Point(x, 0), 0));
+				//}
+				//else if (game.getPos(x,0) == 0) {
+				//	distance[x][0] = 1; 
+				//	pq.add(new Node(new Point(x, 0), 0));
+				//}
+				 
+			} 
+		} else { 
+			for (int y = 0; y < size; y++) { 
+				//if (game.getPos(0,y) == -1) {
+					distance[0][y] = 0; 
+					pq.add(new Node(new Point(0, y), 0));
+				//}
+				//else if (game.getPos(0,y) == 0) {
+				//	distance[0][y] = 1; 
+				//	pq.add(new Node(new Point(0, y), 0));
+				//} 
+			} 
+		} 
+		// Dijkstra's algorithm 
+		while (!pq.isEmpty()) { 
+			Node current = pq.poll(); 
+			Point currentPoint = current.point;
+			
+			if (visited[currentPoint.x][currentPoint.y]) continue;
+			visited[currentPoint.x][currentPoint.y] = true;
+			//System.out.println("NEIGHBORS:");
+			
+			for (Point neighbor : game.getNeigh(currentPoint)) {
+				//System.out.println(neighbor);
+				
+				if (visited[neighbor.x][neighbor.y]) continue;
+				
+				int newDist = distance[currentPoint.x][currentPoint.y]; 
+				if (game.getPos(neighbor) == 0) {
+					newDist++;
+				} else if (game.getPos(neighbor) != PlayerType.getColor(player)) {
+					continue;
+				}
+				
+				if (newDist < distance[neighbor.x][neighbor.y]) { 
+					distance[neighbor.x][neighbor.y] = newDist; 
+					predecessor[neighbor.x][neighbor.y] = currentPoint; 
+					pq.add(new Node(neighbor, newDist)); 
+				} 
+			} 
+		}
+		
+		// Find the shortest distance to the virtual end nodes 
+		int shortestDist = Integer.MAX_VALUE; 
+		if (player == PlayerType.PLAYER2) { 
+			for (int x = 0; x < size; x++) { 
+				shortestDist = Math.min(shortestDist, distance[x][size - 1]); 
+			} 
+		} else { 
+			for (int y = 0; y < size; y++) { 
+				shortestDist = Math.min(shortestDist, distance[size - 1][y]); 
+			} 
+		} 
+		
+		return shortestDist;
+	}
     
     public static int evaluateConnectivity(HexGameStatus gameStatus, int player) {
         int score = 0;
@@ -132,7 +130,7 @@ public class Heuristic
                 if (gameStatus.getPos(x, y) == player) {
                     List<Point> neighbors = gameStatus.getNeigh(new Point(x, y));
                     for (Point neighbor : neighbors) {
-                        if (gameStatus.getPos(neighbor.x, neighbor.y) == 0) {
+                        if (gameStatus.getPos(neighbor.x, neighbor.y) == player) {
                             score++; // Un camino abierto
                         }
                     }

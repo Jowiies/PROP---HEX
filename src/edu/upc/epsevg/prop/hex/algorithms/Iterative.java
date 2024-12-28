@@ -39,7 +39,6 @@ public class Iterative extends MiniMax
                 }
 
                 int score = getBestScore(newStatus, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
-
                 if (score > bestScore && !stop) {
                     bestScore = score;
                     move = mn.getPoint();
