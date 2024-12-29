@@ -27,28 +27,49 @@ public class UnitTesting {
         
         byte[][] board = {
         //X   0  1  2  3  4  5  6  7  8
-            { 1, 1, 1, 0, 0, 0, 0, 0, 1},                     // 0   Y
-              { 1, 1, 1, 1, 1, 1, 0, 0, 0},                    // 1
-                { 1, 0, 0, 0, 0, 0, 0, 0, 0},                  // 2
-                  { 0, 0, 0, 0, 0, 0, 0, 0, 0},                // 3
+            { 0, 0, 0, 0, 0, 0, 0, 0, -1},                     // 0   Y
+              { 0, 0, 0, 0, 0, 0, 0,-1, 0},                    // 1
+                { 0, 0, 0, 0, 0, 0, 0,-1, 0},                  // 2
+                  { 0, 0, 0, 0, 0, 0, 0,-1, 0},                // 3
                     { 0, 0, 0, 0, 0, 0, 0, 0, 0},              // 4  
-                      { 0, 0, 0, 0, 0, 0, 0, 0, 0},            // 5    
+                      { 0, 0, 0, 0, 0, 0,-1, 0, 0},            // 5    
                         { 0, 0, 0, 0, 0, 0, 0, 0, 0},          // 6      
-                          { 0, 0, 0, 0, 0, 0, 0, 0, 0},        // 7       
+                          { 0, 0, 0, 0, 0,-1, 0, 0, 0},        // 7       
                             { 0, 0, 0, 0, 0, 0, 0, 0, 0}       // 8    Y         
         };
        HexGameStatus gs = new HexGameStatus(board, PlayerType.PLAYER1); 
         // Probar el algoritmo de Dijkstra
 		System.out.println("=== Test de Dijkstra ===");
-		MiniMax miniMaxAlgorithm;
-                miniMaxAlgorithm = new Basic(5);
-               Point player1Cost =  miniMaxAlgorithm.findBestMove(gs);
+			
+        int player1Cost = Heuristic.dijkstra(gs, PlayerType.PLAYER1);
+		System.out.println(
+				"Coste para PLAYER1(" 
+				+ PlayerType.getColor(PlayerType.PLAYER1)
+				+"): " + player1Cost
+		);
 		
-       // int player1Cost = Heuristic.evaluate(gs);
+		int player2Cost = Heuristic.dijkstra(gs, PlayerType.PLAYER2);
+		System.out.println(
+				"Coste para PLAYER2(" 
+				+ PlayerType.getColor(PlayerType.PLAYER2)
+				+"): " + player2Cost
+		);
 		
-		System.out.println("Coste para PLAYER1(" + 
-				PlayerType.getColor(PlayerType.PLAYER1) +"): " + player1Cost);
+		int eval = Heuristic.evaluate(gs);
+		System.out.println(
+				"Evaluation: "
+				+ eval
+		);
 		
+		/*
+		MiniMax miniMaxAlgorithm = new Basic(5);
+	    Point bestMove1 = miniMaxAlgorithm.findBestMove(gs);
+		System.out.println(
+				"Movimiento para PLAYER1(" 
+				+ PlayerType.getColor(PlayerType.PLAYER1)
+				+"): " + bestMove1
+		);
+		*/
 	//System.out.println("Coste para PLAYER2:(" + 
 	//			PlayerType.getColor(PlayerType.PLAYER2) +"): " + player2Cost);
 

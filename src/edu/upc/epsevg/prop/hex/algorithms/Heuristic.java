@@ -3,31 +3,18 @@ package edu.upc.epsevg.prop.hex.algorithms;
 import edu.upc.epsevg.prop.hex.HexGameStatus;
 import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 public class Heuristic
 {
-    public int getValue(HexGameStatus status)
-    {
-        return 0;
-    }
     
     public static int evaluate(HexGameStatus gameStatus) {
         PlayerType currentPlayer = gameStatus.getCurrentPlayer();
         PlayerType opponent = PlayerType.opposite(currentPlayer);
         int currentPlayerScore = dijkstra(gameStatus, currentPlayer);
         int opponentScore = dijkstra(gameStatus, opponent);
-        int color = (currentPlayer == PlayerType.PLAYER1) ? 1 : -1;
+        //int color = (currentPlayer == PlayerType.PLAYER1) ? 1 : -1;
         
 
         return (opponentScore - currentPlayerScore) ;
@@ -35,6 +22,7 @@ public class Heuristic
 				//+ heuristicBlockOpponent(gameStatus,currentPlayer) ;
 				//- evaluateOpponentBarriers(gameStatus, color) ;
    }
+	
 	public static int dijkstra(HexGameStatus game, PlayerType player) 
 	{
 		//System.out.println("This Is Dijkstra");
@@ -55,26 +43,14 @@ public class Heuristic
 		// Add virtual start nodes 
 		if (player == PlayerType.PLAYER2) { 
 			for (int x = 0; x < size; x++) {
-				//if (game.getPos(x,0) == -1) {
-					distance[x][0] = 0; 
-					pq.add(new Node(new Point(x, 0), 0));
-				//}
-				//else if (game.getPos(x,0) == 0) {
-				//	distance[x][0] = 1; 
-				//	pq.add(new Node(new Point(x, 0), 0));
-				//}
-				 
+				
+				distance[x][0] = game.getPos(x,0) == 0 ? 1 : 0; 
+				pq.add(new Node(new Point(x, 0), 0));
 			} 
 		} else { 
 			for (int y = 0; y < size; y++) { 
-				//if (game.getPos(0,y) == -1) {
-					distance[0][y] = 0; 
-					pq.add(new Node(new Point(0, y), 0));
-				//}
-				//else if (game.getPos(0,y) == 0) {
-				//	distance[0][y] = 1; 
-				//	pq.add(new Node(new Point(0, y), 0));
-				//} 
+				distance[0][y] = game.getPos(0,y) == 0 ? 1 : 0; 
+				pq.add(new Node(new Point(0, y), 0));
 			} 
 		} 
 		// Dijkstra's algorithm 
@@ -107,17 +83,32 @@ public class Heuristic
 		}
 		
 		// Find the shortest distance to the virtual end nodes 
-		int shortestDist = Integer.MAX_VALUE; 
-		if (player == PlayerType.PLAYER2) { 
-			for (int x = 0; x < size; x++) { 
-				shortestDist = Math.min(shortestDist, distance[x][size - 1]); 
-			} 
-		} else { 
-			for (int y = 0; y < size; y++) { 
-				shortestDist = Math.min(shortestDist, distance[size - 1][y]); 
-			} 
-		} 
+		int shortestDist = Integer.MAX_VALUE;
+		Point endPoint = null;
 		
+		if (player == PlayerType.PLAYER2) {
+			for (int x = 0; x < size; x++) {
+				if (distance[x][size - 1] < shortestDist) {
+					shortestDist = distance[x][size - 1];
+					endPoint = new Point(x, size - 1);
+				}
+			}
+		} else {
+			for (int y = 0; y < size; y++) {
+				if (distance[size - 1][y] < shortestDist) {
+					shortestDist = distance[size - 1][y];
+					endPoint = new Point(size - 1, y);
+				}
+			}
+		}
+		/*
+		System.out.println("End of the path...");
+		while (endPoint != null) {
+			System.out.println(endPoint);
+			endPoint = predecessor[endPoint.x][endPoint.y];
+		}
+		System.out.println("Begining of the path...");
+		*/
 		return shortestDist;
 	}
     
