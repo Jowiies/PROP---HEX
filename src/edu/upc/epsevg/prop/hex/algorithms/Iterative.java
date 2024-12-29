@@ -23,7 +23,10 @@ public class Iterative extends MiniMax
         List<MoveNode> moveList = status.getMoves();
         Point move = moveList.getFirst().getPoint();
         Point trueMove = move;
-
+        
+        if(status.isGameOver()){
+            return move;
+        }
         for (int depth = 1; depth <= maxDepth && !stop; depth++) {
 
             int bestScore = Integer.MIN_VALUE;
@@ -34,12 +37,12 @@ public class Iterative extends MiniMax
                 HexGameStatus newStatus = new HexGameStatus(status);
                 newStatus.placeStone(mn.getPoint());
 
-                if (newStatus.isGameOver()) {
+                /*if (newStatus.isGameOver()) {
                     return mn.getPoint();
-                }
+                }*/
 
                 int score = getBestScore(newStatus, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
-                if (score > bestScore && !stop) {
+                if (!stop && score > bestScore) {
                     bestScore = score;
                     move = mn.getPoint();
                 }

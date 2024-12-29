@@ -35,6 +35,7 @@ public abstract class MiniMax
         List<MoveNode> moveList = status.getMoves();
         if (depth == 0) {
             exploratedNodes++;
+            
             return heuristic.evaluate(status);
         }
 

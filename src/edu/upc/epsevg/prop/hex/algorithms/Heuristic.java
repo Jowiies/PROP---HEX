@@ -28,11 +28,11 @@ public class Heuristic
         int currentPlayerScore = dijkstra(gameStatus, currentPlayer);
         int opponentScore = dijkstra(gameStatus, opponent);
         int color = (currentPlayer == PlayerType.PLAYER1) ? 1 : -1;
+        
 
-
-        return (currentPlayerScore - opponentScore);
-				//+ evaluateConnectivity(gameStatus,color) 
-				//+ heuristicBlockOpponent(gameStatus,currentPlayer) 
+        return (opponentScore - currentPlayerScore) ;
+				//+ evaluateConnectivity(gameStatus,color)
+				//+ heuristicBlockOpponent(gameStatus,currentPlayer) ;
 				//- evaluateOpponentBarriers(gameStatus, color) ;
    }
 	public static int dijkstra(HexGameStatus game, PlayerType player) 
@@ -141,39 +141,59 @@ public class Heuristic
     }
     
     private static int heuristicBlockOpponent(HexGameStatus gameStatus, PlayerType player) {
-    int n = gameStatus.getSize();
+       int n = gameStatus.getSize();
     int blockScore = 0;
 
     // Determina el jugador contrario
     PlayerType opponent = (player == PlayerType.PLAYER1) ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
-    int color = (opponent == PlayerType.PLAYER1) ? 1 : -1;
+    int opponentColor = (opponent == PlayerType.PLAYER1) ? 1 : -1;
+
     // Recorre todo el tablero
     for (int x = 0; x < n; x++) {
         for (int y = 0; y < n; y++) {
             Point currentPoint = new Point(x, y);
 
-            // Si la celda está vacía y tiene algún vecino del oponente, evalúa la oportunidad de bloquear
+            // Si la celda está vacía, evalúa su valor estratégico
             if (gameStatus.getPos(currentPoint) == 0) {
                 List<Point> neighbors = gameStatus.getNeigh(currentPoint);
+                int opponentNeighbors = 0;
 
-                // Verifica si alguna de las celdas vecinas está ocupada por el oponente
-                boolean canBlock = false;
+                // Cuenta vecinos ocupados por el oponente
                 for (Point neighbor : neighbors) {
-                    if (gameStatus.getPos(neighbor) == color) {
-                        canBlock = true;
-                        break;
+                    if (gameStatus.getPos(neighbor) == opponentColor) {
+                        opponentNeighbors++;
                     }
                 }
 
-                // Si hay un vecino del oponente, aumenta la puntuación para bloquear
-                if (canBlock) {
-                    blockScore += 2;  // Penaliza el movimiento enemigo
+                // Aumenta el puntaje según la cantidad de vecinos enemigos
+                if (opponentNeighbors > 0) {
+                    blockScore += opponentNeighbors * 3; // Penaliza más si hay más vecinos enemigos.
+                }
+
+                // Penaliza aún más si el punto bloquea una conexión directa
+                if (blocksCriticalConnection(gameStatus, currentPoint, opponentColor)) {
+                    blockScore += 10; // Ajusta este peso según la importancia.
                 }
             }
         }
     }
 
     return blockScore;
+}
+    
+    private static boolean blocksCriticalConnection(HexGameStatus gameStatus, Point point, int opponentColor) {
+    List<Point> neighbors = gameStatus.getNeigh(point);
+    int connectedNeighbors = 0;
+
+    // Verifica cuántos vecinos están ocupados por el oponente
+    for (Point neighbor : neighbors) {
+        if (gameStatus.getPos(neighbor) == opponentColor) {
+            connectedNeighbors++;
+        }
+    }
+
+    // Considera crítico si conecta dos o más piezas del oponente
+    return connectedNeighbors > 1;
 }
     
         private static int evaluateOpponentBarriers(HexGameStatus gameStatus, int player) {
