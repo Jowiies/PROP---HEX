@@ -1,3 +1,8 @@
+/**
+ * Implementació de l'algoritme MiniMax amb recerca iterativa per trobar
+ * la millor jugada en el joc de Hex.
+ */
+
 package edu.upc.epsevg.prop.hex.algorithms;
 
 import edu.upc.epsevg.prop.hex.HexGameStatus;
@@ -11,11 +16,23 @@ public class Iterative extends MiniMax
 {
     private int currentDepth;
 
+	/**
+	 * Constructor de la classe Iterative.
+	 *
+	 * @param maxDepth La profunditat màxima de cerca per l'algoritme.
+	 */
     public Iterative(int maxDepth)
     {
         super(maxDepth);
     }
 
+	/**
+	 * Troba la millor jugada utilitzant una aproximació iterativa del MiniMax
+	 * amb poda alpha-beta.
+	 *
+	 * @param status L'estat actual del joc de Hex.
+	 * @return El punt del tauler corresponent a la millor jugada calculada.
+	 */	
     @Override
     public Point findBestMove(HexGameStatus status)
     {
@@ -68,19 +85,32 @@ public class Iterative extends MiniMax
         stop = false;
         return trueMove;
     }
-
+	
+	/**
+	 * Atura l'execució de l'algoritme.
+	 */
     @Override
     public void stop()
     {
         this.stop = true;
     }
 
+	/**
+	 * Obté el nombre total de nodes explorats fins al moment.
+	 *
+	 * @return El nombre de nodes explorats.
+	 */	
     @Override
     public long getExplorationDepth()
     {
         return exploratedNodes;
     }
-
+	
+	/**
+	 * Obté la profunditat màxima de cerca assolida durant la cerca iterativa.
+	 *
+	 * @return La profunditat màxima explorada.
+	 */
     @Override
     public int getMaxDepth()
     {

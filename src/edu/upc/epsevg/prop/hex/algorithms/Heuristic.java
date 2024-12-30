@@ -1,3 +1,8 @@
+/**
+ * Aquesta classe implementa diverses heurístiques i algoritmes
+ * per avaluar i optimitzar moviments en un joc de Hex.
+ */
+
 package edu.upc.epsevg.prop.hex.algorithms;
 
 import edu.upc.epsevg.prop.hex.HexGameStatus;
@@ -8,7 +13,14 @@ import java.util.PriorityQueue;
 
 public class Heuristic
 {
-    
+
+    /**
+	 * Avalua l'estat actual del joc segons diverses heurístiques.
+	 *
+	 * @param gameStatus L'estat actual del joc de Hex.
+	 * @return Una puntuació heurística que representa la diferència entre les
+	 * oportunitats del jugador actual i les de l'oponent.
+	 */   
     public static int evaluate(HexGameStatus gameStatus, PlayerType player) {
         PlayerType opponent = PlayerType.opposite(player);
         int currentPlayerScore = dijkstra(gameStatus, player);
@@ -22,8 +34,17 @@ public class Heuristic
 				//+ evaluateConnectivity(gameStatus,color)
 				//+ heuristicBlockOpponent(gameStatus,player) ;
 				//- evaluateOpponentBarriers(gameStatus, color) ;
-   }
+    }
 	
+	/**
+	 * Implementació de l'algoritme de Dijkstra per trobar el camí més curt
+	 * entre els nodes d'un jugador específic en el tauler de Hex.
+	 *
+	 * @param game L'estat actual del joc de Hex.
+	 * @param player El jugador per al qual s'executa l'algoritme.
+	 * @return La distància més curta al llarg del tauler per al jugador
+	 * especificat.
+	 */	
 	public static int dijkstra(HexGameStatus game, PlayerType player) 
 	{
 		//System.out.println("This Is Dijkstra");
@@ -112,8 +133,17 @@ public class Heuristic
 		*/
 		return shortestDist;
 	}
-    
-    public static int evaluateConnectivity(HexGameStatus gameStatus, int player) {
+	
+	/**
+	 * Avalua la connectivitat del tauler per al jugador donat.
+	 *
+	 * @param gameStatus L'estat actual del joc.
+	 * @param player El color del jugador (1 o -1).
+	 * @return Un valor que representa la força de les connexions del jugador en
+	 * el tauler.
+	 */    
+    public static int evaluateConnectivity(HexGameStatus gameStatus, int player)
+	{
         int score = 0;
         
         // Contar cuántos caminos abiertos tiene el jugador (esto depende de tu implementación de la conectividad)
@@ -131,64 +161,93 @@ public class Heuristic
         }
         return score;
     }
-    
-    private static int heuristicBlockOpponent(HexGameStatus gameStatus, PlayerType player) {
-       int n = gameStatus.getSize();
-    int blockScore = 0;
+	
+	
+	/**
+	 * Heurística que avalua el bloqueig potencial de les jugades de l'oponent.
+	 *
+	 * @param gameStatus L'estat actual del joc.
+	 * @param player El jugador actual.
+	 * @return Un valor que representa l'eficàcia de bloquejar l'oponent.
+	 */   
+	public static int heuristicBlockOpponent(HexGameStatus gameStatus, PlayerType player)
+	{
+		int n = gameStatus.getSize();
+		int blockScore = 0;
 
-    // Determina el jugador contrario
-    PlayerType opponent = (player == PlayerType.PLAYER1) ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
-    int opponentColor = (opponent == PlayerType.PLAYER1) ? 1 : -1;
+		// Determina el jugador contrario
+		PlayerType opponent = (player == PlayerType.PLAYER1) ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
+		int opponentColor = (opponent == PlayerType.PLAYER1) ? 1 : -1;
 
-    // Recorre todo el tablero
-    for (int x = 0; x < n; x++) {
-        for (int y = 0; y < n; y++) {
-            Point currentPoint = new Point(x, y);
+		// Recorre todo el tablero
+		for (int x = 0; x < n; x++) {
+			for (int y = 0; y < n; y++) {
+				Point currentPoint = new Point(x, y);
 
-            // Si la celda está vacía, evalúa su valor estratégico
-            if (gameStatus.getPos(currentPoint) == 0) {
-                List<Point> neighbors = gameStatus.getNeigh(currentPoint);
-                int opponentNeighbors = 0;
+				// Si la celda está vacía, evalúa su valor estratégico
+				if (gameStatus.getPos(currentPoint) == 0) {
+					List<Point> neighbors = gameStatus.getNeigh(currentPoint);
+					int opponentNeighbors = 0;
 
-                // Cuenta vecinos ocupados por el oponente
-                for (Point neighbor : neighbors) {
-                    if (gameStatus.getPos(neighbor) == opponentColor) {
-                        opponentNeighbors++;
-                    }
-                }
+					// Cuenta vecinos ocupados por el oponente
+					for (Point neighbor : neighbors) {
+						if (gameStatus.getPos(neighbor) == opponentColor) {
+							opponentNeighbors++;
+						}
+					}
 
-                // Aumenta el puntaje según la cantidad de vecinos enemigos
-                if (opponentNeighbors > 0) {
-                    blockScore += opponentNeighbors * 3; // Penaliza más si hay más vecinos enemigos.
-                }
+					// Aumenta el puntaje según la cantidad de vecinos enemigos
+					if (opponentNeighbors > 0) {
+						blockScore += opponentNeighbors * 3; // Penaliza más si hay más vecinos enemigos.
+					}
 
-                // Penaliza aún más si el punto bloquea una conexión directa
-                if (blocksCriticalConnection(gameStatus, currentPoint, opponentColor)) {
-                    blockScore += 10; // Ajusta este peso según la importancia.
-                }
-            }
-        }
-    }
+					// Penaliza aún más si el punto bloquea una conexión directa
+					if (blocksCriticalConnection(gameStatus, currentPoint, opponentColor)){
+						blockScore += 10; // Ajusta este peso según la importancia.
+					}
+				}
+			}
+		}
+		return blockScore;
+	}
+	
+	/**
+	 * Determina si un punt bloqueja una connexió crítica per a l'oponent.
+	 *
+	 * @param gameStatus L'estat actual del joc.
+	 * @param point El punt a analitzar.
+	 * @param opponentColor El color de l'oponent.
+	 * @return Cert si el punt bloqueja una connexió crítica; fals en cas
+	 * contrari.
+	 */   
+	public static boolean blocksCriticalConnection(HexGameStatus gameStatus, 
+			Point point, int opponentColor) 
+	{
+		List<Point> neighbors = gameStatus.getNeigh(point);
+		int connectedNeighbors = 0;
 
-    return blockScore;
-}
-    
-    private static boolean blocksCriticalConnection(HexGameStatus gameStatus, Point point, int opponentColor) {
-    List<Point> neighbors = gameStatus.getNeigh(point);
-    int connectedNeighbors = 0;
+		// Verifica cuántos vecinos están ocupados por el oponente
+		for (Point neighbor : neighbors) {
+			if (gameStatus.getPos(neighbor) == opponentColor) {
+				connectedNeighbors++;
+			}
+		}
 
-    // Verifica cuántos vecinos están ocupados por el oponente
-    for (Point neighbor : neighbors) {
-        if (gameStatus.getPos(neighbor) == opponentColor) {
-            connectedNeighbors++;
-        }
-    }
-
-    // Considera crítico si conecta dos o más piezas del oponente
-    return connectedNeighbors > 1;
-}
-    
-        private static int evaluateOpponentBarriers(HexGameStatus gameStatus, int player) {
+		// Considera crítico si conecta dos o más piezas del oponente
+		return connectedNeighbors > 1;
+	}
+	
+	/**
+	 * Avalua barreres creades per l'oponent que dificulten el progrés del
+	 * jugador actual.
+	 *
+	 * @param gameStatus L'estat actual del joc.
+	 * @param player El color del jugador actual (1 o -1).
+	 * @return Un valor que representa la penalització per les barreres creades
+	 * per l'oponent.
+	 */    
+    public static int evaluateOpponentBarriers(HexGameStatus gameStatus, int player)
+	{
         int opponent = (player == 1) ? -1 : 1;
         int score = 0;
         
@@ -207,11 +266,19 @@ public class Heuristic
         }
         return score;
     }
-    
-        private static class Node {
+	
+	/**
+	 * Classe interna que representa un node en l'algoritme de Dijkstra. 
+	 */
+    private static class Node {
         Point point = null;
         int cost = 0;
-
+		/**
+		 * Constructor per inicialitzar un node amb un punt i un cost
+		 *
+		 * @param point El punt que representa aquest node.
+		 * @param cost El cost associat a aquest punt.
+		 */	
         Node(Point point, int cost) {
             this.point = point;
             this.cost = cost;
