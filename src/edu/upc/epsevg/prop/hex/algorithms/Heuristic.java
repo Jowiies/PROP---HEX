@@ -18,6 +18,7 @@ public class Heuristic
 	 * Avalua l'estat actual del joc segons diverses heurístiques.
 	 *
 	 * @param gameStatus L'estat actual del joc de Hex.
+	 * @param player El jugador que es vol avaluar.
 	 * @return Una puntuació heurística que representa la diferència entre les
 	 * oportunitats del jugador actual i les de l'oponent.
 	 */   

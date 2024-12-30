@@ -45,6 +45,8 @@ public abstract class MiniMax
 	 * @param alpha El valor alfa per a la poda alfa-beta.
 	 * @param beta El valor beta per a la poda alfa-beta.
 	 * @param isMax Indica si és el torn del jugador maximitzador.
+	 * @param player El nostre jugador.
+	 * 
 	 * @return La millor puntuació calculada per a l'estat donat.
 	 */
     protected int getBestScore(HexGameStatus status, int depth, int alpha, int beta, boolean isMax, PlayerType player)
