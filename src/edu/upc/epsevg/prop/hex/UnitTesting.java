@@ -55,7 +55,7 @@ public class UnitTesting {
 				+"): " + player2Cost
 		);
 		
-		int eval = Heuristic.evaluate(gs);
+		int eval = Heuristic.evaluate(gs,PlayerType.PLAYER1);
 		System.out.println(
 				"Evaluation: "
 				+ eval

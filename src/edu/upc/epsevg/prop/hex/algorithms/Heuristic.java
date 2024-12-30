@@ -9,17 +9,18 @@ import java.util.PriorityQueue;
 public class Heuristic
 {
     
-    public static int evaluate(HexGameStatus gameStatus) {
-        PlayerType currentPlayer = gameStatus.getCurrentPlayer();
-        PlayerType opponent = PlayerType.opposite(currentPlayer);
-        int currentPlayerScore = dijkstra(gameStatus, currentPlayer);
+    public static int evaluate(HexGameStatus gameStatus, PlayerType player) {
+        PlayerType opponent = PlayerType.opposite(player);
+        int currentPlayerScore = dijkstra(gameStatus, player);
+        //if(currentPlayerScore == 0) currentPlayerScore = Integer.MIN_VALUE;
         int opponentScore = dijkstra(gameStatus, opponent);
+      //  if(opponentScore == 0) opponentScore = Integer.MIN_VALUE;
         //int color = (currentPlayer == PlayerType.PLAYER1) ? 1 : -1;
         
 
         return (opponentScore - currentPlayerScore) ;
 				//+ evaluateConnectivity(gameStatus,color)
-				//+ heuristicBlockOpponent(gameStatus,currentPlayer) ;
+				//+ heuristicBlockOpponent(gameStatus,player) ;
 				//- evaluateOpponentBarriers(gameStatus, color) ;
    }
 	
