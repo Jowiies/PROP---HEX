@@ -1,8 +1,3 @@
-/**
- * Implementació bàsica de l'algoritme MiniMax per trobar
- * la millor jugada en el joc de Hex.
- */
-
 package edu.upc.epsevg.prop.hex.algorithms;
 
 import edu.upc.epsevg.prop.hex.HexGameStatus;
@@ -12,6 +7,10 @@ import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Implementació bàsica de l'algoritme MiniMax per trobar la millor jugada en el
+ * joc de Hex.
+ */
 public class Basic extends MiniMax
 {
 	

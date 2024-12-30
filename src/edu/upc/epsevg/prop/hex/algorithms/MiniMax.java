@@ -1,8 +1,4 @@
-/**
- * Classe abstracta que implementa l'algoritme MiniMax per al joc de Hex.
- * Proporciona funcionalitats bàsiques de MiniMax amb poda alfa-beta i
- * ordenació de moviments basada en heurístiques.
- */
+
 
 package edu.upc.epsevg.prop.hex.algorithms;
 
@@ -13,6 +9,11 @@ import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Classe abstracta que implementa l'algoritme MiniMax per al joc de Hex.
+ * Proporciona funcionalitats bàsiques de MiniMax amb poda alfa-beta i ordenació
+ * de moviments basada en heurístiques.
+ */
 public abstract class MiniMax
 {
     protected boolean stop;

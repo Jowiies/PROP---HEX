@@ -1,7 +1,4 @@
-/**
- * Implementació de l'algoritme MiniMax amb recerca iterativa per trobar
- * la millor jugada en el joc de Hex.
- */
+
 
 package edu.upc.epsevg.prop.hex.algorithms;
 
@@ -12,6 +9,10 @@ import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Implementació de l'algoritme MiniMax amb recerca iterativa per trobar la
+ * millor jugada en el joc de Hex.
+ */
 public class Iterative extends MiniMax
 {
     private int currentDepth;

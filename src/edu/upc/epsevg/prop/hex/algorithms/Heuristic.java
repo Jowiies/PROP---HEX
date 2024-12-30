@@ -1,8 +1,3 @@
-/**
- * Aquesta classe implementa diverses heurístiques i algoritmes
- * per avaluar i optimitzar moviments en un joc de Hex.
- */
-
 package edu.upc.epsevg.prop.hex.algorithms;
 
 import edu.upc.epsevg.prop.hex.HexGameStatus;
@@ -11,6 +6,10 @@ import java.awt.Point;
 import java.util.List;
 import java.util.PriorityQueue;
 
+/**
+ * Aquesta classe implementa diverses heurístiques i algoritmes per avaluar i
+ * optimitzar moviments en un joc de Hex.
+ */
 public class Heuristic
 {
 
