@@ -37,14 +37,14 @@ public class Basic extends MiniMax
         PlayerType player = status.getCurrentPlayer();
         int bestScore = Integer.MIN_VALUE;
        
-		List<MoveNode> moveList = sortedTrimedList(status);
+	List<MoveNode> moveList = sortedTrimedList(status);
 		
-		Point move = moveList.getFirst().getPoint();
+	Point move = moveList.getFirst().getPoint();
 
 
         for (int i = 0; i < moveList.size(); ++i) {
 			MoveNode mn = moveList.get(i);
-            GameStatus newStatus = new GameStatus(status,0);
+            GameStatus newStatus = new GameStatus(status);
             newStatus.placeStone(mn.getPoint());
 
             if (newStatus.isGameOver()) {

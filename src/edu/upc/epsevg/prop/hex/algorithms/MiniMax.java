@@ -62,23 +62,28 @@ public abstract class MiniMax
             exploratedNodes++;     
             return Heuristic.evaluate(status, /*isMax ?*/ player /*: PlayerType.opposite(player)*/);
         }
+        
+        
 		
-		List<MoveNode> moveList = sortedTrimedList(status);
-		
-		GameStatus bestStatus = getBestBoard(status);
-		
-		if (bestStatus != null) return getBestScore(bestStatus, depth - 1, alpha, beta, !isMax, player);
+	List<MoveNode> moveList = sortedTrimedList(status);
+	
+        if (zobristTable != null) {
+            GameStatus bestStatus = getBestBoard(status);
+            if (bestStatus != null) return getBestScore(bestStatus, depth - 1, alpha, beta, !isMax, player);
+        }
 		
         int bestScore = isMax ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 		
-		long bestBoardH = 0;
+	long bestBoardH = 0;
         for (int i = 0; i < moveList.size(); ++i) {
             if (stop) {return 0;}
 			
 			if (isMax) {
                             MoveNode mn = moveList.get(i);
                             GameStatus newStatus = new GameStatus(status);
-                            newStatus.placeStone(mn.getPoint(), zobristTable);
+                            if (zobristTable != null ) newStatus.placeStone(mn.getPoint(), zobristTable);
+                            else newStatus.placeStone(mn.getPoint());	
+
 			
                             if (newStatus.isGameOver()) return isMax ? Integer.MAX_VALUE : Integer.MIN_VALUE;
 			
@@ -93,15 +98,16 @@ public abstract class MiniMax
 			else {
                             MoveNode mn = moveList.get(i);
                             GameStatus newStatus = new GameStatus(status);
-                            newStatus.placeStone(mn.getPoint(), zobristTable);
+                            if (zobristTable != null ) newStatus.placeStone(mn.getPoint(), zobristTable);
+                            else newStatus.placeStone(mn.getPoint());	
 			
-                                int score = getBestScore(newStatus, depth - 1, alpha, beta, !isMax, player);
-                                if (stop) {return 0;}
-				if (score < bestScore) {
-					bestScore = score;
-					bestBoardH = newStatus.hash;
-				}
-				beta = Math.min(beta, bestScore);
+                            int score = getBestScore(newStatus, depth - 1, alpha, beta, !isMax, player);
+                            if (stop) {return 0;}
+                            if (score < bestScore) {
+				bestScore = score;
+				bestBoardH = newStatus.hash;
+                            }
+                            beta = Math.min(beta, bestScore);
 			}
 			/*
             bestScore = isMax ? Math.max(bestScore, score) : Math.min(bestScore, score);
@@ -111,7 +117,8 @@ public abstract class MiniMax
 			*/
             if (alpha >= beta) {break;}
         }
-		transpositionTable.put(bestBoardH, bestScore);
+	
+        if (zobristTable != null) transpositionTable.put(bestBoardH, bestScore);
         return bestScore;
     }
 	
@@ -160,8 +167,8 @@ public abstract class MiniMax
 		moveList.sort((a, b) -> {
 			GameStatus statusA = new GameStatus(status);
 			GameStatus statusB = new GameStatus(status);
-			statusA.placeStone(a.getPoint(), zobristTable);
-			statusB.placeStone(b.getPoint(),zobristTable);
+			statusA.placeStone(a.getPoint());
+			statusB.placeStone(b.getPoint());
 			int scoreA = Heuristic.evaluate(statusA, player);
 			int scoreB = Heuristic.evaluate(statusB, player);
 			return Integer.compare(scoreB, scoreA); // Sort Descending

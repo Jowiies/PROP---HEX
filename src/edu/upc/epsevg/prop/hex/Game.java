@@ -27,7 +27,7 @@ public class Game {
             public void run() {
                 
               IPlayer player1 = new H_E_X_Player(2/*GB*/);
-                IPlayer player2 = new BogoHex(11, true);
+                IPlayer player2 = new BogoHex();
              // IPlayer player1 = new RandomPlayer("Rand");
 
                 new Board(player1 , player2, 11 /*mida*/,  15/*s*/, false);
