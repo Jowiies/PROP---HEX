@@ -2,11 +2,11 @@
 
 package edu.upc.epsevg.prop.hex.algorithms;
 
-import edu.upc.epsevg.prop.hex.HexGameStatus;
 import edu.upc.epsevg.prop.hex.MoveNode;
 import edu.upc.epsevg.prop.hex.PlayerType;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -35,36 +35,32 @@ public class Iterative extends MiniMax
 	 * @return El punt del tauler corresponent a la millor jugada calculada.
 	 */	
     @Override
-    public Point findBestMove(HexGameStatus status)
+    public Point findBestMove(GameStatus status)
     {
-        exploratedNodes = 0;
-        PlayerType player = status.getCurrentPlayer();
-	List<MoveNode> moveList = status.getMoves();
-
-	moveList.sort((a, b) -> {
-            HexGameStatus statusA = new HexGameStatus(status);
-            HexGameStatus statusB = new HexGameStatus(status);
-            statusA.placeStone(a.getPoint());
-            statusB.placeStone(b.getPoint());
-            int scoreA = heuristic.evaluate(statusA, player);
-            int scoreB = heuristic.evaluate(statusB, player);
-            return Integer.compare(scoreB, scoreA); // Sort Descending
-	});
+		zobristTable = buildZobristTable(status.getSize());
+		transpositionTable = new HashMap();
+		status.hash = calculateZobristHash(status);			// Calculamos la hash del tablero inicial
 		
+        exploratedNodes = 0;
+		
+        PlayerType player = status.getCurrentPlayer();
+		
+		List<MoveNode> moveList = /*status.getMoves();*/sortedTrimedList(status);		// Devuelve la lista ordenada y recortada.
+		Point bestInitialMove = null;
         Point move = moveList.getFirst().getPoint();
         Point trueMove = move;
-
+		long bestHash = 0;
+		
         for (int depth = 1; depth <= maxDepth && !stop; depth++) {
 
             int bestScore = Integer.MIN_VALUE;
-            
-
-            for (int i = 0; i < 20 && i < moveList.size(); ++i) {
+	
+            for (int i = 0; i < moveList.size(); ++i) {
                 if (stop) {break;}
 				MoveNode mn = moveList.get(i);
 
-                HexGameStatus newStatus = new HexGameStatus(status);
-                newStatus.placeStone(mn.getPoint());
+                GameStatus newStatus = new GameStatus(status);
+				newStatus.placeStone(mn.getPoint(), zobristTable);
 
                 if (newStatus.isGameOver()) {
                     return mn.getPoint();
@@ -74,12 +70,20 @@ public class Iterative extends MiniMax
                 if (score > bestScore) {
                     bestScore = score;
                     move = mn.getPoint();
+					bestHash = newStatus.hash;
                 }
             }
 
             if (!stop) {
                 currentDepth = depth;
                 trueMove = move;
+				
+				if (maxDepth == 1) {
+					MoveNode bestInitial = new MoveNode(move);
+					moveList.remove(bestInitial);
+					moveList.add(0,bestInitial);
+					transpositionTable.put(bestHash, bestScore);
+				} 
             }
         }
 

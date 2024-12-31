@@ -31,28 +31,20 @@ public class Basic extends MiniMax
 	 * @return El punt del tauler corresponent a la millor jugada calculada.
 	 */
     @Override
-    public Point findBestMove(HexGameStatus status)
+    public Point findBestMove(GameStatus status)
     {
         exploratedNodes = 0;
         PlayerType player = status.getCurrentPlayer();
-        List<MoveNode> moveList = status.getMoves();
         int bestScore = Integer.MIN_VALUE;
        
-		moveList.sort((a, b) -> {
-				HexGameStatus statusA = new HexGameStatus(status);
-				HexGameStatus statusB = new HexGameStatus(status);
-				statusA.placeStone(a.getPoint());
-				statusB.placeStone(b.getPoint());
-				int scoreA = heuristic.evaluate(statusA, player);
-				int scoreB = heuristic.evaluate(statusB, player);
-				return Integer.compare(scoreB, scoreA); // Sort Descending
-		});
+		List<MoveNode> moveList = sortedTrimedList(status);
+		
 		Point move = moveList.getFirst().getPoint();
 
 
-        for (int i = 0; i < moveList.size() && i < 20; ++i) {
+        for (int i = 0; i < moveList.size(); ++i) {
 			MoveNode mn = moveList.get(i);
-            HexGameStatus newStatus = new HexGameStatus(status);
+            GameStatus newStatus = new GameStatus(status,0);
             newStatus.placeStone(mn.getPoint());
 
             if (newStatus.isGameOver()) {

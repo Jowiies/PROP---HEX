@@ -3,6 +3,7 @@ package edu.upc.epsevg.prop.hex.algorithms;
 import edu.upc.epsevg.prop.hex.HexGameStatus;
 import edu.upc.epsevg.prop.hex.PlayerType;
 import java.awt.Point;
+import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -30,10 +31,10 @@ public class Heuristic
         //int color = (currentPlayer == PlayerType.PLAYER1) ? 1 : -1;
         
 
-        return (opponentScore - currentPlayerScore) ;
-				//+ evaluateConnectivity(gameStatus,color)
-				//+ heuristicBlockOpponent(gameStatus,player) ;
-				//- evaluateOpponentBarriers(gameStatus, color) ;
+        return (opponentScore - currentPlayerScore);
+				//+ evaluateConnectivity(gameStatus,gameStatus.getCurrentPlayerColor());
+				//+heuristicBlockOpponent(gameStatus,player) ;
+				//- evaluateOpponentBarriers(gameStatus, gameStatus.getCurrentPlayerColor()) ;
     }
 	
 	/**
@@ -47,25 +48,16 @@ public class Heuristic
 	 */	
 	public static int dijkstra(HexGameStatus game, PlayerType player) 
 	{
-		//System.out.println("This Is Dijkstra");
 		int size = game.getSize();
 		int[][] distance = new int[size][size];
-		Point[][] predecessor = new Point[size][size];
-		PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> a.cost - b.cost);
 		boolean[][] visited = new boolean[size][size]; 
-
-		// Initialize distances with infinity 
-		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < size; j++) { 
-				distance[i][j] = Integer.MAX_VALUE;
-				predecessor[i][j] = null;
-			} 
-		} 
+		PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> a.cost - b.cost);
+		
+		for (int[] row : distance) Arrays.fill(row, Integer.MAX_VALUE);
 
 		// Add virtual start nodes 
 		if (player == PlayerType.PLAYER2) { 
 			for (int x = 0; x < size; x++) {
-				
 				distance[x][0] = game.getPos(x,0) == 0 ? 1 : 0; 
 				pq.add(new Node(new Point(x, 0), 0));
 			} 
@@ -82,11 +74,9 @@ public class Heuristic
 			
 			if (visited[currentPoint.x][currentPoint.y]) continue;
 			visited[currentPoint.x][currentPoint.y] = true;
-			//System.out.println("NEIGHBORS:");
 			
 			List<Point> neighbors = getVirtualNeighbors(currentPoint, game);
 			for (Point neighbor : neighbors) {
-				//System.out.println(neighbor);
 				
 				if (visited[neighbor.x][neighbor.y]) continue;
 				
@@ -99,7 +89,6 @@ public class Heuristic
 				
 				if (newDist < distance[neighbor.x][neighbor.y]) { 
 					distance[neighbor.x][neighbor.y] = newDist; 
-					predecessor[neighbor.x][neighbor.y] = currentPoint; 
 					pq.add(new Node(neighbor, newDist)); 
 				} 
 			} 
@@ -107,31 +96,16 @@ public class Heuristic
 		
 		// Find the shortest distance to the virtual end nodes 
 		int shortestDist = Integer.MAX_VALUE;
-		Point endPoint = null;
 		
 		if (player == PlayerType.PLAYER2) {
 			for (int x = 0; x < size; x++) {
-				if (distance[x][size - 1] < shortestDist) {
-					shortestDist = distance[x][size - 1];
-					endPoint = new Point(x, size - 1);
-				}
+				shortestDist = Math.min(shortestDist, distance[x][size - 1]);
 			}
 		} else {
 			for (int y = 0; y < size; y++) {
-				if (distance[size - 1][y] < shortestDist) {
-					shortestDist = distance[size - 1][y];
-					endPoint = new Point(size - 1, y);
-				}
+				shortestDist = Math.min(shortestDist, distance[size - 1][y]);
 			}
 		}
-		/*
-		System.out.println("End of the path...");
-		while (endPoint != null) {
-			System.out.println(endPoint);
-			endPoint = predecessor[endPoint.x][endPoint.y];
-		}
-		System.out.println("Begining of the path...");
-		*/
 		return shortestDist;
 	}
 	
@@ -166,18 +140,9 @@ public class Heuristic
 			
 			posX = point.x + directions[i][0];
 			posY = point.y + directions[i][1];
-			//System.out.println("Virtual Neighbor: (" + posX + "," + posY + ")");
+			
 			if (posX >= 0 && posX < size && posY >= 0 && posY < size) {
-				//System.out.println("Im not out of bounds!");
-				
-				//int neigh1X = neighbors[i][0];
-				//int neigh1Y = neighbors[i][1];
-				//System.out.println("Neighbor1: (" + neigh1X + "," + neigh1Y + ")");
-				
-				//int neigh2X = neighbors[(i+1)%6][0];
-				//int neigh2Y = neighbors[(i+1)%6][1];
-				//System.out.println("Neighbor1: (" + neigh2X + "," + neigh2Y + ")");
-				
+	
 				if (game.getPos(point.x + neighbors[i][0], point.y + neighbors[i][1]) == 0
 					&& game.getPos(point.x + neighbors[(i+1)%6][0],point.y + neighbors[(i+1)%6][1]) == 0) 
 				{
