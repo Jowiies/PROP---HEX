@@ -55,6 +55,7 @@ public abstract class MiniMax
 	 */
     protected int getBestScore(GameStatus status, int depth, int alpha, int beta, boolean isMax, PlayerType player)
     {
+        if (status.isGameOver()) return isMax ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         if (stop) {return 0;}
 		
         if (depth == 0) {
@@ -74,17 +75,15 @@ public abstract class MiniMax
         for (int i = 0; i < moveList.size(); ++i) {
             if (stop) {return 0;}
 			
-            MoveNode mn = moveList.get(i);
-            GameStatus newStatus = new GameStatus(status);
-			newStatus.placeStone(mn.getPoint(), zobristTable);
-			
-            if (newStatus.isGameOver()) return isMax ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-			
-            int score = getBestScore(newStatus, depth - 1, alpha, beta, !isMax, player);
-
-            if (stop) {return 0;}
-			
 			if (isMax) {
+                            MoveNode mn = moveList.get(i);
+                            GameStatus newStatus = new GameStatus(status);
+                            newStatus.placeStone(mn.getPoint(), zobristTable);
+			
+                            if (newStatus.isGameOver()) return isMax ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+			
+                                int score = getBestScore(newStatus, depth - 1, alpha, beta, !isMax, player);
+                                if (stop) {return 0;}
 				if (score > bestScore) {
 					bestScore = score;
 					bestBoardH = newStatus.hash;
@@ -92,6 +91,12 @@ public abstract class MiniMax
 				alpha = Math.max(alpha, bestScore);
 			}
 			else {
+                            MoveNode mn = moveList.get(i);
+                            GameStatus newStatus = new GameStatus(status);
+                            newStatus.placeStone(mn.getPoint(), zobristTable);
+			
+                                int score = getBestScore(newStatus, depth - 1, alpha, beta, !isMax, player);
+                                if (stop) {return 0;}
 				if (score < bestScore) {
 					bestScore = score;
 					bestBoardH = newStatus.hash;
@@ -157,12 +162,12 @@ public abstract class MiniMax
 			GameStatus statusB = new GameStatus(status);
 			statusA.placeStone(a.getPoint(), zobristTable);
 			statusB.placeStone(b.getPoint(),zobristTable);
-			int scoreA = (transpositionTable.containsKey(statusA.hash)) ? transpositionTable.get(statusA.hash) : Heuristic.evaluate(statusA, player);
-			int scoreB = (transpositionTable.containsKey(statusB.hash)) ? transpositionTable.get(statusB.hash) : Heuristic.evaluate(statusB, player);
+			int scoreA = Heuristic.evaluate(statusA, player);
+			int scoreB = Heuristic.evaluate(statusB, player);
 			return Integer.compare(scoreB, scoreA); // Sort Descending
 		});
 		
-		if (moveList.size() > 30) moveList = moveList.subList(0,30);
+		if (moveList.size() > 20) moveList = moveList.subList(0,20);
 		/*
 		for (int i = 0; i < moveList.size(); ++i) {
 			MoveNode mn = moveList.get(i);

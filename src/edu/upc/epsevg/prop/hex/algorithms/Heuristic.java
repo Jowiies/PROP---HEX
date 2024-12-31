@@ -27,13 +27,14 @@ public class Heuristic
         int currentPlayerScore = dijkstra(gameStatus, player);
         //if(currentPlayerScore == 0) currentPlayerScore = Integer.MIN_VALUE;
         int opponentScore = dijkstra(gameStatus, opponent);
-      //  if(opponentScore == 0) opponentScore = Integer.MIN_VALUE;
+        //if(opponentScore == 0) opponentScore = Integer.MIN_VALUE;
         //int color = (currentPlayer == PlayerType.PLAYER1) ? 1 : -1;
-        
+       //  int victoryHeuristic = heuristicVictory(gameStatus, player) - heuristicVictory(gameStatus, opponent);
 
         return (opponentScore - currentPlayerScore);
+        
 				//+ evaluateConnectivity(gameStatus,gameStatus.getCurrentPlayerColor());
-				//+heuristicBlockOpponent(gameStatus,player) ;
+				//+victoryHeuristic ;
 				//- evaluateOpponentBarriers(gameStatus, gameStatus.getCurrentPlayerColor()) ;
     }
 	
@@ -182,81 +183,29 @@ public class Heuristic
         }
         return score;
     }
-	
-	
-	/**
-	 * Heurística que avalua el bloqueig potencial de les jugades de l'oponent.
-	 *
-	 * @param gameStatus L'estat actual del joc.
-	 * @param player El jugador actual.
-	 * @return Un valor que representa l'eficàcia de bloquejar l'oponent.
-	 */   
-	public static int heuristicBlockOpponent(HexGameStatus gameStatus, PlayerType player)
-	{
-		int n = gameStatus.getSize();
-		int blockScore = 0;
+private static int heuristicVictory(HexGameStatus gameStatus, PlayerType player) {
+    int n = gameStatus.getSize();
+    int score = 0;
+    int color = (player == PlayerType.PLAYER1) ? 1 : -1;
+    // Dependiendo de si el jugador es PLAYER1 o PLAYER2, la victoria se acerca a diferentes bordes.
+    if (player == PlayerType.PLAYER1) {
+        // PLAYER1 busca llegar al borde derecho
+        for (int i = 0; i < n; i++) {
+            if (gameStatus.getPos(new Point(i, n - 1)) == color ) {
+                score++;  // Aumento el puntaje si hay un jugador en el borde
+            }
+        }
+    } else {
+        // PLAYER2 busca llegar al borde inferior
+        for (int i = 0; i < n; i++) {
+            if (gameStatus.getPos(new Point(n - 1, i)) == color ) {
+                score++;  // Aumento el puntaje si hay un jugador en el borde
+            }
+        }
+    }
 
-		// Determina el jugador contrario
-		PlayerType opponent = (player == PlayerType.PLAYER1) ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
-		int opponentColor = (opponent == PlayerType.PLAYER1) ? 1 : -1;
-
-		// Recorre todo el tablero
-		for (int x = 0; x < n; x++) {
-			for (int y = 0; y < n; y++) {
-				Point currentPoint = new Point(x, y);
-
-				// Si la celda está vacía, evalúa su valor estratégico
-				if (gameStatus.getPos(currentPoint) == 0) {
-					List<Point> neighbors = gameStatus.getNeigh(currentPoint);
-					int opponentNeighbors = 0;
-
-					// Cuenta vecinos ocupados por el oponente
-					for (Point neighbor : neighbors) {
-						if (gameStatus.getPos(neighbor) == opponentColor) {
-							opponentNeighbors++;
-						}
-					}
-
-					// Aumenta el puntaje según la cantidad de vecinos enemigos
-					if (opponentNeighbors > 0) {
-						blockScore += opponentNeighbors * 3; // Penaliza más si hay más vecinos enemigos.
-					}
-
-					// Penaliza aún más si el punto bloquea una conexión directa
-					if (blocksCriticalConnection(gameStatus, currentPoint, opponentColor)){
-						blockScore += 10; // Ajusta este peso según la importancia.
-					}
-				}
-			}
-		}
-		return blockScore;
-	}
-	
-	/**
-	 * Determina si un punt bloqueja una connexió crítica per a l'oponent.
-	 *
-	 * @param gameStatus L'estat actual del joc.
-	 * @param point El punt a analitzar.
-	 * @param opponentColor El color de l'oponent.
-	 * @return Cert si el punt bloqueja una connexió crítica; fals en cas
-	 * contrari.
-	 */   
-	public static boolean blocksCriticalConnection(HexGameStatus gameStatus, 
-			Point point, int opponentColor) 
-	{
-		List<Point> neighbors = gameStatus.getNeigh(point);
-		int connectedNeighbors = 0;
-
-		// Verifica cuántos vecinos están ocupados por el oponente
-		for (Point neighbor : neighbors) {
-			if (gameStatus.getPos(neighbor) == opponentColor) {
-				connectedNeighbors++;
-			}
-		}
-
-		// Considera crítico si conecta dos o más piezas del oponente
-		return connectedNeighbors > 1;
-	}
+    return score;
+}
 	
 	/**
 	 * Avalua barreres creades per l'oponent que dificulten el progrés del
