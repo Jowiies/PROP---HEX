@@ -60,7 +60,7 @@ public abstract class MiniMax
 		
         if (depth == 0) {
             exploratedNodes++;     
-            return Heuristic.evaluate(status, /*isMax ?*/ player /*: PlayerType.opposite(player)*/);
+            return Heuristic.evaluate(status, player );
         }
         
         
@@ -109,20 +109,24 @@ public abstract class MiniMax
                             }
                             beta = Math.min(beta, bestScore);
 			}
-			/*
-            bestScore = isMax ? Math.max(bestScore, score) : Math.min(bestScore, score);
 
-            if(isMax) alpha = Math.max(alpha, bestScore);
-            else beta = Math.min(beta, bestScore);
-			*/
             if (alpha >= beta) {break;}
         }
 	
         if (zobristTable != null) transpositionTable.put(bestBoardH, bestScore);
         return bestScore;
     }
-	
-	protected static long[][][] buildZobristTable(int size) {
+	/**
+        * Construeix una taula de Zobrist per a un tauler de la mida especificada.
+        * La taula de Zobrist és una estructura que conté valors aleatoris únics 
+        * per a cada combinació de jugador i posició al tauler.
+        * S'utilitza per calcular hashes únics d'estats de joc en algoritmes com Minimax.
+        *
+        * @param size la mida del tauler (nombre de files i columnes).
+        * @return una taula tridimensional de nombres aleatoris, on l'índex és:
+        *         [jugador][posició x][posició y].
+        */
+    public static long[][][] buildZobristTable(int size) {
 		
         long[][][] table = new long[2][size][size];
         Random random = new Random();
@@ -136,7 +140,15 @@ public abstract class MiniMax
         return table;
     }
 
-    protected static long calculateZobristHash(HexGameStatus gs) {
+    /**
+    * Calcula el hash Zobrist per a un estat del joc Hex.
+    * Aquest hash es genera utilitzant la taula de Zobrist i representa 
+    * un identificador únic per a l'estat actual del tauler.
+    *
+    * @param gs l'estat actual del joc Hex.
+    * @return un valor hash únic que representa l'estat actual del joc.
+    */
+    public static long calculateZobristHash(HexGameStatus gs) {
         long hash = 0L;
         for (int x = 0; x < gs.getSize(); x++) {
             for (int y = 0; y < gs.getSize(); y++) {
@@ -148,46 +160,51 @@ public abstract class MiniMax
         }
         return hash;
     }
-	
-	protected GameStatus getBestBoard(GameStatus status) 
-	{
-		for (MoveNode mn : status.getMoves()) {
-			GameStatus newStatus = new GameStatus(status);
-			newStatus.placeStone(mn.getPoint(),zobristTable);
-			if (transpositionTable.containsKey(newStatus.hash))
-				return newStatus;
-		}
-		return null;
-	}
-	
-	protected List<MoveNode> sortedTrimedList(GameStatus status) 
-	{
-		PlayerType player = status.getCurrentPlayer();
-		List<MoveNode> moveList = status.getMoves();
-		moveList.sort((a, b) -> {
-			GameStatus statusA = new GameStatus(status);
-			GameStatus statusB = new GameStatus(status);
-			statusA.placeStone(a.getPoint());
-			statusB.placeStone(b.getPoint());
-			int scoreA = Heuristic.evaluate(statusA, player);
-			int scoreB = Heuristic.evaluate(statusB, player);
-			return Integer.compare(scoreB, scoreA); // Sort Descending
-		});
-		
-		if (moveList.size() > 20) moveList = moveList.subList(0,20);
-		/*
-		for (int i = 0; i < moveList.size(); ++i) {
-			MoveNode mn = moveList.get(i);
-			GameStatus newStatus = new GameStatus(status);
-			newStatus.placeStone(mn.getPoint(), zobristTable);		// Ponemos una piedra y actualizamos la hash
-			if (transpositionTable.containsKey(newStatus.hash)) {
-				// Si está en la tabla, pone el movimiento al principio de la lista y acaba el bucle
-				moveList.remove(mn);
-				moveList.add(0, mn);
-				break;
-			}
-		}
-		*/
-		return moveList;
-	}
+
+    /**
+    * Obté el millor estat del tauler a partir dels moviments disponibles 
+    * utilitzant la taula de transposició. Si un estat ja està emmagatzemat a 
+    * la taula de transposició, es retorna aquest estat com el millor tauler.
+    *
+    * @param status l'estat actual del joc, incloent la llista de moviments disponibles.
+    * @return el millor estat del joc trobat a la taula de transposició, 
+    *         o null si no se'n troba cap.
+    */
+    public GameStatus getBestBoard(GameStatus status) 
+    {
+        for (MoveNode mn : status.getMoves()) {
+                GameStatus newStatus = new GameStatus(status);
+                newStatus.placeStone(mn.getPoint(),zobristTable);
+                if (transpositionTable.containsKey(newStatus.hash))
+                        return newStatus;
+        }
+        return null;
+    }
+    
+    /**
+    * Genera una llista ordenada i retallada dels moviments disponibles al tauler.
+    * Els moviments es classifiquen en funció de la seva puntuació heurística, 
+    * calculada per al jugador actual. Després d'ordenar, la llista es retalla per 
+    * incloure només els 20 millors moviments.
+    *
+    * @param status l'estat actual del joc, incloent la llista de moviments disponibles.
+    * @return una llista dels 20 millors moviments ordenats per puntuació heurística.
+    */
+    public List<MoveNode> sortedTrimedList(GameStatus status) 
+    {
+        PlayerType player = status.getCurrentPlayer();
+        List<MoveNode> moveList = status.getMoves();
+        moveList.sort((a, b) -> {
+                GameStatus statusA = new GameStatus(status);
+                GameStatus statusB = new GameStatus(status);
+                statusA.placeStone(a.getPoint());
+                statusB.placeStone(b.getPoint());
+                int scoreA = Heuristic.evaluate(statusA, player);
+                int scoreB = Heuristic.evaluate(statusB, player);
+                return Integer.compare(scoreB, scoreA); // Sort Descending
+        });
+
+        if (moveList.size() > 20) moveList = moveList.subList(0,20);
+        return moveList;
+    }
 }

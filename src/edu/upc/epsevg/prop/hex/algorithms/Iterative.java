@@ -45,7 +45,7 @@ public class Iterative extends MiniMax
 		
         PlayerType player = status.getCurrentPlayer();
 		
-		List<MoveNode> moveList = /*status.getMoves();*/sortedTrimedList(status);		// Devuelve la lista ordenada y recortada.
+		List<MoveNode> moveList = sortedTrimedList(status);		// Devuelve la lista ordenada y recortada.
 		Point bestInitialMove = null;
         Point move = moveList.getFirst().getPoint();
         Point trueMove = move;
