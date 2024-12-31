@@ -45,8 +45,8 @@ public class Iterative extends MiniMax
 		
         PlayerType player = status.getCurrentPlayer();
 		
-		List<MoveNode> moveList = /*status.getMoves();*/sortedTrimedList(status);		// Devuelve la lista ordenada y recortada.
-		Point bestInitialMove = null;
+		List<MoveNode> moveList = status.getMoves();/*sortedTrimedList(status);	*/	// Devuelve la lista ordenada y recortada.
+
         Point move = moveList.getFirst().getPoint();
         Point trueMove = move;
 		long bestHash = 0;
@@ -54,7 +54,7 @@ public class Iterative extends MiniMax
         for (int depth = 1; depth <= maxDepth && !stop; depth++) {
 
             int bestScore = Integer.MIN_VALUE;
-	
+            
             for (int i = 0; i < moveList.size(); ++i) {
                 if (stop) {break;}
 				MoveNode mn = moveList.get(i);
@@ -79,9 +79,6 @@ public class Iterative extends MiniMax
                 trueMove = move;
 				
 				if (maxDepth == 1) {
-					MoveNode bestInitial = new MoveNode(move);
-					moveList.remove(bestInitial);
-					moveList.add(0,bestInitial);
 					transpositionTable.put(bestHash, bestScore);
 				} 
             }
