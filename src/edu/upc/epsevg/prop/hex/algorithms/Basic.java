@@ -37,9 +37,21 @@ public class Basic extends MiniMax
         PlayerType player = status.getCurrentPlayer();
         List<MoveNode> moveList = status.getMoves();
         int bestScore = Integer.MIN_VALUE;
-        Point move = moveList.getFirst().getPoint();
+       
+		moveList.sort((a, b) -> {
+				HexGameStatus statusA = new HexGameStatus(status);
+				HexGameStatus statusB = new HexGameStatus(status);
+				statusA.placeStone(a.getPoint());
+				statusB.placeStone(b.getPoint());
+				int scoreA = heuristic.evaluate(statusA, player);
+				int scoreB = heuristic.evaluate(statusB, player);
+				return Integer.compare(scoreB, scoreA); // Sort Descending
+		});
+		Point move = moveList.getFirst().getPoint();
 
-        for (MoveNode mn : moveList) {
+
+        for (int i = 0; i < moveList.size() && i < 20; ++i) {
+			MoveNode mn = moveList.get(i);
             HexGameStatus newStatus = new HexGameStatus(status);
             newStatus.placeStone(mn.getPoint());
 

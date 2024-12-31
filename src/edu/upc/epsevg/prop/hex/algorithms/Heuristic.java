@@ -84,7 +84,8 @@ public class Heuristic
 			visited[currentPoint.x][currentPoint.y] = true;
 			//System.out.println("NEIGHBORS:");
 			
-			for (Point neighbor : game.getNeigh(currentPoint)) {
+			List<Point> neighbors = getVirtualNeighbors(currentPoint, game);
+			for (Point neighbor : neighbors) {
 				//System.out.println(neighbor);
 				
 				if (visited[neighbor.x][neighbor.y]) continue;
@@ -132,6 +133,61 @@ public class Heuristic
 		System.out.println("Begining of the path...");
 		*/
 		return shortestDist;
+	}
+	
+	
+	public static List<Point> getVirtualNeighbors(Point point, HexGameStatus game)
+	{
+		//System.out.println("Point:" + point);
+		int[][] directions = {
+			{-1,-1},	// Top Left 
+			{1, -2},	// Top
+			{2, -1},	// Top Right
+			{1,  1},	// Bottom Right
+			{-1, 2},	// Bottom
+			{-2, 1}		// Bottom Left
+		};
+		
+		int [][] neighbors = {
+			{-1, 0},
+			{0, -1},
+			{1, -1},
+			{1,  0},
+			{0,  1},
+			{-1, 1}
+		};
+				
+		List<Point> virtualNeighbors = game.getNeigh(point);
+		
+		int size = game.getSize();
+		int posX, posY;
+		
+		for (int i = 0; i < directions.length; ++i) {
+			
+			posX = point.x + directions[i][0];
+			posY = point.y + directions[i][1];
+			//System.out.println("Virtual Neighbor: (" + posX + "," + posY + ")");
+			if (posX >= 0 && posX < size && posY >= 0 && posY < size) {
+				//System.out.println("Im not out of bounds!");
+				
+				//int neigh1X = neighbors[i][0];
+				//int neigh1Y = neighbors[i][1];
+				//System.out.println("Neighbor1: (" + neigh1X + "," + neigh1Y + ")");
+				
+				//int neigh2X = neighbors[(i+1)%6][0];
+				//int neigh2Y = neighbors[(i+1)%6][1];
+				//System.out.println("Neighbor1: (" + neigh2X + "," + neigh2Y + ")");
+				
+				if (game.getPos(point.x + neighbors[i][0], point.y + neighbors[i][1]) == 0
+					&& game.getPos(point.x + neighbors[(i+1)%6][0],point.y + neighbors[(i+1)%6][1]) == 0) 
+				{
+					virtualNeighbors.add(new Point(posX, posY));
+				}
+			}
+			
+		}
+		
+		return virtualNeighbors;
 	}
 	
 	/**

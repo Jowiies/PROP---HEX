@@ -56,13 +56,13 @@ public abstract class MiniMax
 		
         if (depth == 0) {
             exploratedNodes++;     
-            return heuristic.evaluate(status, isMax ? player : PlayerType.opposite(player));
+            return heuristic.evaluate(status, /*isMax ?*/ player /*: PlayerType.opposite(player)*/);
         }
 		
 		List<MoveNode> moveList = status.getMoves();
 
 		moveList.sort((a, b) -> {
-                        PlayerType currentplayer = status.getCurrentPlayer();
+            PlayerType currentplayer = status.getCurrentPlayer();
 			HexGameStatus statusA = new HexGameStatus(status);
 			HexGameStatus statusB = new HexGameStatus(status);
 			statusA.placeStone(a.getPoint());
